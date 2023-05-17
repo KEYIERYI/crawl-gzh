@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>gzh</title>
+	<script type="text/javascript">
+		var bizList;
+		var fakeid;
+		function search() {
+			var cookie = document.getElementById("cookieT").value;
+			var token = document.getElementById("tokenT").value;
+			var inputValue = document.getElementById("inputBiz").value
+			var myRequest = new Request("http://localhost:10845/bizlist?query=" + inputValue, { 
+				method: 'GET',
+				headers: {
+					'cookies': cookie,
+					'token': token,
+				},
+				})
+			fetch(myRequest).then(function(response) {
+				return response.text();
+			}).then(function(response){
+				bizList = JSON.parse(response)
+				var contextDiv = document.getElementById("biz")
+				contextDiv.innerHTML = ""
+				for(var i = 0; i < bizList.length; i++){
+					var eachLi_ = document.createElement('li')
+					var img_ = '<img src="'+ bizList[i].round_head_img +'" width="50px" height="50px" style="margin-right: 10px">'
+					var nickname_ = '<strong style="top: 0; margin-right: 50px">'+ bizList[i].nickname +'</strong>'
+					var i_ = '"' + i + '"'
+					var btn_ = '<button onclick="showArticle('+ i +')">article</button>'
+					eachLi_.innerHTML =  img_ + nickname_ + btn_
+					contextDiv.appendChild(eachLi_)
+				}
+			});
+		}
+		function showArticle(i){
+			fakeid = bizList[i].fakeid
+			var formSpan = document.getElementById("formSpan")
+			formSpan.innerHTML = '<input id="inputArticle" type="text" value="" placeholder="article"><button onclick="article()">search</button>'
+			article()
+		}
+		function article(){
+			var cookie = document.getElementById("cookieT").value;
+			var token = document.getElementById("tokenT").value;
+			var inputValue = document.getElementById("inputArticle").value
+			var myRequest = new Request("http://localhost:10845/articlelist?fakeid=" + fakeid + "&query=" + inputValue, { 
+				method: 'GET',
+				headers: {
+					'cookies': cookie,
+					'token': token,
+				},
+				})
+			fetch(myRequest).then(function(response) {
+				return response.text();
+			}).then(function(response){
+				list = JSON.parse(response)
+				var contextDiv = document.getElementById("article")
+				contextDiv.innerHTML = ""
+				for(var i = 0; i < list.length; i++){
+					var eachLi_ = document.createElement('li')
+					var cover_ = '<img src="'+ list[i].cover +'" width="100px" height="100px" style="margin-right: 10px">'
+					var title_ = '<a href="'+ list[i].link +'">'+ list[i].title +'</a>'
+					eachLi_.innerHTML = cover_ + title_
+					contextDiv.appendChild(eachLi_)
+				}
+			})
+		}
+	</script>
+</head>
+<body>
+	<div style="text-align: center;">
+		<textarea id="cookieT" value="" placeholder="cookie"></textarea>
+		<textarea id="tokenT" value="" placeholder="token"></textarea>
+	</div>
+	<div style="margin: 0; width: 100%">
+		<div style="text-align: center;">
+			<input id="inputBiz" type="text" value="" placeholder="biz">
+			<button onclick="search()">search</button>
+			<span id="formSpan" style="margin-left: 50px">
+			</span>
+		</div>
+		<div id="biz" style="width: 50%;background: grey; float: left;">
+		</div>
+		<div id="article" style="width: 50%; float: right;">
+		</div>
+	</div>
+</body>
+</html>
